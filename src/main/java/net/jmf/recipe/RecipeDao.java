@@ -175,6 +175,33 @@ public class RecipeDao {
         return recipe;        
     }
 
+    public List<Recipe> list() {
+        PreparedStatement stmt = null;
+        List<Recipe> recipeList = new ArrayList<>();
+        try {
+            stmt = conn.prepareStatement("select id, name, directions from recipes");
+            List<Ingredient> ingredients = new ArrayList<>();
+            try (ResultSet results = stmt.executeQuery()) {
+                while(results.next()) {
+                    ingredients.clear();
+                    int id = results.getInt(1);
+                    String name = results.getString(2);
+                    String directions = results.getString(3);
+                    selectIngredients(id, ingredients);
+                    recipeList.add(new Recipe(id, name, directions, ingredients));
+                }
+            }
+        }
+        catch (SQLException sqe) {
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
+        }
+        finally {
+            close(stmt);
+        }
+        return recipeList;
+    }
+
     public void delete(int id) {
         List<Ingredient> ingredients = new ArrayList<>();
         selectIngredients(id, ingredients);

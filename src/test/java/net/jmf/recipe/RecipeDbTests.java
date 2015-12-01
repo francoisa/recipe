@@ -70,6 +70,14 @@ public class RecipeDbTests {
     }
 
     @Test
+    public void listRecipesShouldReturnAList() throws SQLException {
+        Recipe expected = insertTestRecipe();
+        List<Recipe> actual = recipeDao.list();
+        assertThat(actual.size(), is(equalTo(1)));
+        assertThat(actual.get(0), is(equalTo(expected)));
+    }
+
+    @Test
     public void updateRecipeShouldModifyDirections() throws SQLException {
         Recipe expected = insertTestRecipe();
         String directions = "Add egg to 2 cups of boiling water for 15 minutes.";
