@@ -42,7 +42,8 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
         }
         finally {
             close(stmt);
@@ -66,7 +67,8 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
         }
         finally {
             close(stmt);
@@ -94,7 +96,8 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
         }
         finally {
             close(stmt);
@@ -125,7 +128,8 @@ public class RecipeDao {
                 }
             }
             catch (SQLException sqe) {
-                sqe.printStackTrace(System.err);
+                LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+                throw new RuntimeException(sqe.getMessage());
             }
             finally {
                 close(stmt);
@@ -144,7 +148,7 @@ public class RecipeDao {
             }
         }
     }
-    
+
     public Recipe get(int id) {
         List<Ingredient> ingredients = new ArrayList<>();
         selectIngredients(id, ingredients);
@@ -162,7 +166,8 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
         }
         finally {
             close(stmt);
@@ -170,6 +175,27 @@ public class RecipeDao {
         return recipe;        
     }
 
+    public void delete(int id) {
+        List<Ingredient> ingredients = new ArrayList<>();
+        selectIngredients(id, ingredients);
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement("delete from recipes where id = ?");
+            stmt.setInt(1, id);
+            int rowCount = stmt.executeUpdate();
+            if (rowCount != 1) {
+                LOG.warning("Delete did not affect 1 row.");
+            }
+        }
+        catch (SQLException sqe) {
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
+        }
+        finally {
+            close(stmt);
+        }
+    }
+    
     public void selectIngredients(int recipeId, List<Ingredient> ingredients) {
         PreparedStatement stmt = null;
         try {
@@ -195,7 +221,8 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
+            throw new RuntimeException(sqe.getMessage());
         }
         finally {
             close(stmt);
@@ -214,7 +241,7 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
             throw new RuntimeException(sqe);
         }
         finally {
@@ -235,7 +262,7 @@ public class RecipeDao {
             }
         }
         catch (SQLException sqe) {
-            sqe.printStackTrace(System.err);
+            LOG.log(Level.SEVERE, sqe.getMessage(), sqe);
             throw new RuntimeException(sqe);
         }
         finally {

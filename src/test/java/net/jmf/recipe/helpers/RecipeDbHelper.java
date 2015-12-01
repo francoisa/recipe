@@ -239,6 +239,26 @@ public class RecipeDbHelper {
         return recipe;
     }
 
+    public int countRecipes() {
+        int count = -1;
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement("select count(*) from recipes");
+            try (ResultSet results = stmt.executeQuery()) {
+                while(results.next()) {
+                    count = results.getInt(1);
+                }
+            }
+        }
+        catch (SQLException sqe) {
+            sqe.printStackTrace(System.err);
+        }
+        finally {
+            close(stmt);
+        }
+        return count;
+    }
+
     public void selectIngredients(int recipeId, List<Ingredient> ingredients) {
         PreparedStatement stmt = null;
         try {

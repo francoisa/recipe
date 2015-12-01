@@ -70,7 +70,7 @@ public class RecipeDbTests {
     }
 
     @Test
-    public void updateRecipeShouldModifyARecipe() throws SQLException {
+    public void updateRecipeShouldModifyDirections() throws SQLException {
         Recipe expected = insertTestRecipe();
         String directions = "Add egg to 2 cups of boiling water for 15 minutes.";
         expected = new Recipe(expected.getId(), expected.getName(), directions, 
@@ -78,6 +78,15 @@ public class RecipeDbTests {
         recipeDao.update(expected);
         Recipe actual = dbHelper.selectRecipe(expected.getId());
         assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void deleteRecipeShouldRemoveARecipe() throws SQLException {
+        Recipe expected = insertTestRecipe();
+        int oldCount = dbHelper.countRecipes();
+        recipeDao.delete(expected.getId());
+        int newCount = dbHelper.countRecipes();
+        assertThat((oldCount - newCount), is(equalTo(1)));
     }
 
     private Recipe insertTestRecipe() {
