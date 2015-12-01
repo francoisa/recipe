@@ -51,6 +51,30 @@ public class RecipeDao {
         return id;
     }
     
+    public String update(Recipe recipe) {
+        String result = "SUCCESS";
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement("update recipes " + 
+                    "set directions = ?" +
+                    " where id = ?");
+            stmt.setString(1, recipe.getDirections());
+            stmt.setInt(2, recipe.getId());
+            int rowCount = stmt.executeUpdate();
+            if (rowCount != 1) {
+                LOG.warning("Update recipes failed.");
+            }
+        }
+        catch (SQLException sqe) {
+            sqe.printStackTrace(System.err);
+        }
+        finally {
+            close(stmt);
+        }
+        recipe.getIngredients().stream().forEach(ingredient -> updateIngredient(recipe.getId(), ingredient));        
+        return result;
+    }
+    
     private int insertIngredient(int recipeId, Ingredient ingredient) {
         int id = getNewIngredientId();
         PreparedStatement stmt = null;
@@ -74,6 +98,38 @@ public class RecipeDao {
         }
         finally {
             close(stmt);
+        }
+        return id;
+    }
+    
+    private int updateIngredient(int recipeId, Ingredient ingredient) {
+        int id = getNewIngredientId();
+        if (ingredient.getId() > 0) {
+            insertIngredient(recipeId, ingredient);
+        }
+        else {
+            PreparedStatement stmt = null;
+            try {
+                stmt = conn.prepareStatement("update ingredients set" + 
+                        " unit = ?, ingredient = ?, amount = ?, fraction = ?" +
+                        " where recipe_id = ? and id = ?");
+                stmt.setString(1, ingredient.getUnit());
+                stmt.setString(2, ingredient.getIngredient());
+                stmt.setInt(3, ingredient.getAmount());
+                stmt.setString(4, ingredient.getFraction().toString());
+                stmt.setInt(5, recipeId);
+                stmt.setInt(6, id);
+                int rowCount = stmt.executeUpdate();
+                if (rowCount != 1) {
+                    LOG.warning("Insert into recipes failed.");
+                }
+            }
+            catch (SQLException sqe) {
+                sqe.printStackTrace(System.err);
+            }
+            finally {
+                close(stmt);
+            }
         }
         return id;
     }

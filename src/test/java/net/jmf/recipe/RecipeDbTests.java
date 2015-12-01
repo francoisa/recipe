@@ -25,9 +25,11 @@ public class RecipeDbTests {
     private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";    
     private static final String CONNECTIONURL = "jdbc:derby:memory:myDB;create=true";    
     private static RecipeDbHelper dbHelper;
+    RecipeDao recipeDao;
     
     @Before
     public void setup() {
+        recipeDao = new RecipeDao(dbHelper.getConnection());
     }
 
     @BeforeClass
@@ -54,7 +56,6 @@ public class RecipeDbTests {
         List<Ingredient> ingredients = new ArrayList<>();
         ingredients.add(new Ingredient("each", "egg", 1, Fraction.zero));
         Recipe actual = new Recipe(name, directions, ingredients);
-        RecipeDao recipeDao = new RecipeDao(dbHelper.getConnection());
         int id = recipeDao.save(actual);
         assertThat(id, is(greaterThan(0)));
         Recipe expected = dbHelper.selectRecipe(id);
@@ -63,15 +64,29 @@ public class RecipeDbTests {
     
     @Test
     public void getRecipeShouldReturnARecipe() throws SQLException {
+        Recipe expected = insertTestRecipe();
+        Recipe actual = recipeDao.get(expected.getId());
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void updateRecipeShouldModifyARecipe() throws SQLException {
+        Recipe expected = insertTestRecipe();
+        String directions = "Add egg to 2 cups of boiling water for 15 minutes.";
+        expected = new Recipe(expected.getId(), expected.getName(), directions, 
+                    expected.getIngredients());
+        recipeDao.update(expected);
+        Recipe actual = dbHelper.selectRecipe(expected.getId());
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    private Recipe insertTestRecipe() {
         String name = "boiled egg"; 
         String directions = "Boil 2 cups of water. Add egg for 15 minutes.";
         List<Ingredient> ingredients = new ArrayList<>();
         ingredients.add(new Ingredient("each", "egg", 1, Fraction.zero));
-        Recipe expected = new Recipe(name, directions, ingredients);
-        RecipeDao recipeDao = new RecipeDao(dbHelper.getConnection());
-        int id = dbHelper.insertRecipe(expected);
-        Recipe actual = recipeDao.get(id);
-        assertThat(actual, is(equalTo(expected)));
+        Recipe recipe = new Recipe(name, directions, ingredients);
+        int id = dbHelper.insertRecipe(recipe);       
+        return new Recipe(id, name, directions, ingredients);
     }
-
 }
