@@ -25,11 +25,11 @@ public class RecipeDbTests {
     private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";    
     private static final String CONNECTIONURL = "jdbc:derby:memory:myDB;create=true";    
     private static RecipeDbHelper dbHelper;
-    RecipeDao recipeDao;
+    JdbcRecipeDao recipeDao;
     
     @Before
     public void setup() {
-        recipeDao = new RecipeDao(dbHelper.getConnection());
+        recipeDao = new JdbcRecipeDao(dbHelper.getConnection());
     }
 
     @BeforeClass
