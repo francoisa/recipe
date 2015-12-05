@@ -64,12 +64,22 @@ public class RecipeRestApiTests extends JerseyTest {
     }
     
     @Test
-    public void getShouldReturnARecipe() {
+    public void recipePathShouldReturnARecipe() {
         final String json = target("/recipe")
                 .path("/" + String.valueOf(ID))
                 .request()
                 .get(String.class);
         Recipe recipe = gson.fromJson(json, Recipe.class);
         assertThat(recipe, is(equalTo(expectedRecipe)));
+    }     
+
+    @Test
+    public void recipesPathShouldReturnARecipeList() {
+        final String json = target("/recipes")
+                .request()
+                .get(String.class);
+        Recipe[] recipes = gson.fromJson(json, Recipe[].class);
+        assertThat(recipes.length, is(equalTo(1)));
+        assertThat(recipes[0], is(equalTo(expectedRecipe)));
     }     
 }

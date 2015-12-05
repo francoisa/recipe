@@ -34,4 +34,11 @@ public class RecipeResource {
     public String getRecipe(@PathParam("id") int id) {
         return gson.toJson(dao.get(id));
     }    
+    
+    @GET
+    @Path("recipes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getRecipes() {
+        return gson.toJson(dao.list());
+    }    
 }
